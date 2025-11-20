@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ case.title }} - 小红书法庭</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #ff4757;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+        nav a::before {
+            content: '←';
+            margin-right: 5px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .case-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .case-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .case-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+        .meta-label {
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        .case-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .type-civil {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .type-general {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+        .case-status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .status-pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .status-ongoing {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-settled {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+        .case-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #ff4757;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .section-title {
+            color: #ff4757;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff4757;
+        }
+        .evidence-section {
+            margin-bottom: 40px;
+        }
+        .evidence-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 768px) {
+            .evidence-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .evidence-column {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .evidence-column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .column-title {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .initiator-side {
+            color: #d32f2f;
+        }
+        .opponent-side {
+            color: #1976d2;
+        }
+        .evidence-item {
+            display: inline-block;
+            background: white;
+            padding: 15px;
+            margin-right: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            min-width: 300px;
+            max-width: 400px;
+            vertical-align: top;
+        }
+        .evidence-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .evidence-item.key {
+            border-left: 4px solid #ff4757;
+        }
+        .evidence-item.proxy {
+            border-left: 4px solid #ffc107;
+        }
+        .evidence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .evidence-meta {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .evidence-type {
+            background: #e0e0e0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+        .evidence-type.image {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .evidence-type.audio {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+        .evidence-type.video {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .evidence-type.file {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .evidence-content {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        .evidence-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .action-btn:hover {
+            background: #f0f0f0;
+            color: #ff4757;
+        }
+        .action-btn.active {
+            color: #ff4757;
+            font-weight: 500;
+        }
+        .legal-notes {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .legal-note-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dotted #c8e6c9;
+        }
+        .legal-note-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .legal-article {
+            font-weight: 500;
+            color: #2e7d32;
+        }
+        .submit-evidence-form {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        /* 响应式：提交证据表单双列布局 */
+        .form-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .form-row .col-support,
+        .form-row .col-type {
+            flex: 1;
+        }
+        /* 桌面端比例：支持 45%，证据类型 55% */
+        @media (min-width: 769px) {
+            .form-row .col-support { flex: 0 0 45%; }
+            .form-row .col-type { flex: 0 0 55%; }
+        }
+        /* 小屏自动单列 */
+        @media (max-width: 768px) {
+            .form-row { flex-direction: column; gap: 10px; }
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 120px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: #ff4757;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 500;
+        }
+        .btn:hover {
+            background: #ff3838;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        /* 证据文件展示样式 */
+        .evidence-file {
+            max-width: 100%;
+            margin: 10px 0;
+        }
+        .evidence-file.image {
+            max-height: 200px;
+            border-radius: 4px;
+        }
+        .evidence-file.audio, .evidence-file.video {
+            width: 100%;
+        }
+        .evidence-file.file {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .evidence-file.file a {
+            text-decoration: none;
+            color: #1976d2;
+        }
+        /* 证据目录+滑动框样式 */
+        .evidence-category {
+            margin-bottom: 20px;
+        }
+        .evidence-category-header {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            border-left: 3px solid #1976d2;
+        }
+        .evidence-category-header.opponent {
+            border-left-color: #d32f2f;
+        }
+        .evidence-category-header:hover {
+            background: #f0f0f0;
+        }
+        .evidence-category-content {
+            margin-top: 10px;
+            display: none;
+        }
+        .evidence-category-content.active {
+            display: block;
+        }
+        .evidence-slider {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 0;
+            scrollbar-width: thin;
+        }
+        .evidence-slider::-webkit-scrollbar {
+            height: 6px;
+        }
+        .evidence-slider::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .evidence-slider::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        .evidence-slider::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* 图片预览样式 */
+        .evidence-preview {
+            margin-top: 10px;
+            max-width: 200px;
+            max-height: 200px;
+            display: none;
+        }
+        .evidence-preview.active {
+            display: block;
+        }
+        .comment-section {
+            margin-top: 40px;
+            display: none;
+        }
+        .comment-section.active {
+            display: block;
+        }
+        .comment-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .comment-form textarea {
+            min-height: 100px;
+        }
+        .comment-list {
+            margin-top: 20px;
+        }
+        .comment-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .comment-author {
+            font-weight: 500;
+        }
+        .comment-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .comment-content {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .comment-actions {
+            display: flex;
+            gap: 15px;
+        }
+        .blocked-comment {
+            background: #ffebee;
+            color: #c62828;
+            font-style: italic;
+        }
+        /* 左右对抗式PK进度条 */
+        .pk-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .pk-section:hover {
+            background: #e0e0e0;
+        }
+        .pk-container {
+            position: relative;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .pk-left {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #e57373, #d32f2f);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+        .pk-right {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #1976d2, #64b5f6);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+        .pk-label {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+        .pk-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .support-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .support-btn {
+            padding: 10px 30px;
+            border: 2px solid #f57f17;
+            border-radius: 20px;
+            background: white;
+            color: #f57f17;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .support-btn:hover {
+            background: #f57f17;
+            color: white;
+        }
+        .support-btn.active {
+            background: #f57f17;
+            color: white;
+        }
+        .timeline-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .timeline-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            background: #ff4757;
+            border-radius: 50%;
+            margin-right: 15px;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .timeline-content {
+            flex: 1;
+        }
+        .timeline-description {
+            margin-bottom: 5px;
+        }
+        .timeline-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .agreement-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .agreement-content {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border: 1px solid #bbdefb;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-family: 'Courier New', monospace;
+        }
+        .agreement-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .agreement-status {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .status-signed {
+            color: #388e3c;
+            font-weight: 500;
+        }
+        .status-pending {
+            color: #f57c00;
+            font-weight: 500;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .flash {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .no-content {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 16px; }
+            .pk-section { padding: 12px; }
+            .comment-form { padding: 16px; }
+            .comment-item { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <header>
+        <h1>小红书法庭</h1>
+    </header>
+
+    <nav>
+        <a href="/">返回首页</a>
+    </nav>
+
+    <div class="container">
+        <!-- 案件基本信息 -->
+        <div class="case-header">
+            <h2 class="case-title">{{ case.title }}</h2>
+            <div class="case-meta">
+                <div class="meta-item">
+                    <span class="meta-label">发起人：</span>
+                    <span>{{ case.initiator.username }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">类型：</span>
+                    <span class="case-type-badge type-{{ case.case_type }}">
+                        {% if case.case_type == 'civil' %}民事案件{% else %}泛式讨论{% endif %}
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">状态：</span>
+                    <span class="case-status-badge status-{{ case.status }}">
+                        {% if case.status == 'pending' %}待处理{% elif case.status == 'ongoing' %}进行中{% elif case.status == 'settled' %}已调解{% else %}已关闭{% endif %}
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">发布时间：</span>
+                    <span>{{ case.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </div>
+            </div>
+            <div class="case-description">
+                {{ case.description }}
+            </div>
+        </div>
+
+        <!-- 证据展示 -->
+        <div class="evidence-section">
+            <h3 class="section-title">证据材料</h3>
+            
+            <div class="evidence-container">
+                <!-- 发起方证据 -->
+                <div class="evidence-column">
+                    <div class="evidence-column-header">
+                        <div class="column-title initiator-side">发起方证据</div>
+                        <div class="evidence-count">{{ initiator_evidences|length }} 份</div>
+                    </div>
+                    
+                    {% if initiator_evidences %}
+                        <!-- 按时间顺序显示所有证据 -->
+                        <div class="evidence-timeline">
+                            {% for evidence in initiator_evidences %}
+                                                <div class="evidence-item {% if evidence.is_key %}key{% endif %} {% if evidence.is_proxy %}proxy{% endif %}" onclick="viewEvidenceDetails('{{evidence.id}}')" style="cursor:pointer; position: relative;">
+                                                    <div style="position:absolute; top:8px; right:8px;">
+                                                        <button type="button" onclick="toggleEllipsisMenu(event, 'menu-evi-{{evidence.id}}')" style="background:none; border:none; font-size:14px; color:#333; cursor:pointer;">···</button>
+                                                        <div id="menu-evi-{{evidence.id}}" style="position:absolute; right:0; top:24px; display:none; background:#fff; border:1px solid #eee; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1); min-width:120px;">
+                                                            {% if current_user.id == evidence.submitter_id %}
+                                                                <button type="button" class="menu-item delete-action" data-delete-url="/api/delete_evidence/{{ evidence.id }}" style="background:none; border:none; padding:8px 12px; width:100%; text-align:left; cursor:pointer;">删除</button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="evidence-header">
+                                                        <div class="evidence-meta">
+                                                            <span>{{ evidence.submitter.username }}</span>
+                                                            <span>{{ evidence.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                                            <span class="evidence-type {{ evidence.evidence_type }}">{{ evidence.evidence_type }}</span>
+                                                            {% if evidence.is_proxy %}<span class="evidence-type" style="background:#fff3cd; color:#856404;">代举证</span>{% endif %}
+                                                            {% if evidence.status == 'incomplete' %}<span class="evidence-type" style="background:#f8d7da; color:#721c24;">证据不全</span>{% endif %}
+                                                        </div>
+                                                    </div>
+                                                    {% if evidence.content %}
+                                                        <div class="evidence-content">{{ evidence.content }}</div>
+                                                    {% endif %}
+                                                    
+                                                    <!-- 显示文件内容 -->
+                                                    {% if evidence.file_path %}
+                                                        {% if evidence.evidence_type == 'image' %}
+                                                            <div class="evidence-file image">
+                                                                {% set img_src = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <img src="{{ img_src }}" alt="证据图片" style="max-width:100%; max-height:200px;">
+                                                            </div>
+                                                        {% elif evidence.evidence_type == 'audio' %}
+                                                            <div class="evidence-file audio">
+                                                                {% set audio_src = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <audio controls>
+                                                                    <source src="{{ audio_src }}" type="audio/mpeg">
+                                                                    您的浏览器不支持音频播放。
+                                                                </audio>
+                                                            </div>
+                                                        {% elif evidence.evidence_type == 'video' %}
+                                                            <div class="evidence-file video">
+                                                                {% set video_src = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <video width="100%" controls>
+                                                                    <source src="{{ video_src }}" type="video/mp4">
+                                                                    您的浏览器不支持视频播放。
+                                                                </video>
+                                                            </div>
+                                                        {% elif evidence.evidence_type == 'file' %}
+                                                            <div class="evidence-file file">
+                                                                {% set file_href = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <a href="{{ file_href }}" target="_blank">📎 下载文件</a>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    
+                                                    <!-- 法律注释 -->
+                                                    {% if evidence.legal_notes %}
+                                                        <div class="legal-notes">
+                                                            {% for note in evidence.legal_notes %}
+                                                                <div class="legal-note-item">
+                                                                    <div class="legal-article">{{ note.legal_article }}</div>
+                                                                    <div>{{ note.note_content }}</div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    
+                                                    <div class="evidence-actions">
+                                                        {% if current_user.is_authenticated %}
+                                                            <!-- 标记关键证据 -->
+                                                            {% if current_user.id == evidence.submitter_id or current_user.id == case.initiator_id %}
+                                                                <form method="POST" action="/mark_key_evidence/{{ evidence.id }}" style="display: inline;">
+                                                                    <button type="submit" class="action-btn {{ 'active' if evidence.is_key else '' }}">
+                                                                        ⭐ {{ '已标记' if evidence.is_key else '标记关键' }}
+                                                                    </button>
+                                                                </form>
+                                                            {% endif %}
+                                                            
+                                                            <!-- 点赞证据 -->
+                                                            <form method="POST" action="/like_evidence/{{ evidence.id }}" style="display: inline;" onclick="event.stopPropagation()">
+                                                                <button type="submit" class="action-btn" onclick="event.stopPropagation()">
+                                                                    👍 {{ evidence.likes }}
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-content">暂无可展示的证据</div>
+                    {% endif %}
+                </div>
+                
+                <!-- 对峙方证据 -->
+                <div class="evidence-column">
+                    <div class="evidence-column-header">
+                        <div class="column-title opponent-side">对峙方证据</div>
+                        <div class="evidence-count">{{ opponent_evidences|length }} 份</div>
+                    </div>
+                    
+                    {% if opponent_evidences %}
+                        <!-- 按时间顺序显示所有证据 -->
+                        <div class="evidence-timeline">
+                            {% for evidence in opponent_evidences %}
+                                                <div class="evidence-item {{ 'key' if evidence.is_key else '' }} {{ 'proxy' if evidence.is_proxy else '' }}" onclick="viewEvidenceDetails('{{evidence.id}}')" style="cursor:pointer; position: relative;">
+                                                    <div style="position:absolute; top:8px; right:8px;">
+                                                        <button type="button" onclick="toggleEllipsisMenu(event, 'menu-evi-{{evidence.id}}')" style="background:none; border:none; font-size:14px; color:#333; cursor:pointer;">···</button>
+                                                        <div id="menu-evi-{{evidence.id}}" style="position:absolute; right:0; top:24px; display:none; background:#fff; border:1px solid #eee; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1); min-width:120px;">
+                                                            {% if current_user.id == evidence.submitter_id %}
+                                                                <button type="button" class="menu-item delete-action" data-delete-url="/delete_evidence/{{ evidence.id }}" style="background:none; border:none; padding:8px 12px; width:100%; text-align:left; cursor:pointer;">删除</button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="evidence-header">
+                                                        <div class="evidence-meta">
+                                                            <span>{{ evidence.submitter.username }}</span>
+                                                            <span>{{ evidence.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                                            <span class="evidence-type {{ evidence.evidence_type }}">{{ evidence.evidence_type }}</span>
+                                                            {% if evidence.is_proxy %}<span class="evidence-type" style="background:#fff3cd; color:#856404;">代举证</span>{% endif %}
+                                                            {% if evidence.status == 'incomplete' %}<span class="evidence-type" style="background:#f8d7da; color:#721c24;">证据不全</span>{% endif %}
+                                                        </div>
+                                                    </div>
+                                                    {% if evidence.content %}
+                                                        <div class="evidence-content">{{ evidence.content }}</div>
+                                                    {% endif %}
+                                                    
+                                                    <!-- 显示文件内容 -->
+                                                    {% if evidence.file_path %}
+                                                        {% if evidence.evidence_type == 'image' %}
+                                                            <div class="evidence-file image">
+                                                                {% set img_src = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <img src="{{ img_src }}" alt="证据图片" style="max-width:100%; max-height:200px;">
+                                                            </div>
+                                                        {% elif evidence.evidence_type == 'audio' %}
+                                                            <div class="evidence-file audio">
+                                                                {% set audio_src = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <audio controls>
+                                                                    <source src="{{ audio_src }}" type="audio/mpeg">
+                                                                    您的浏览器不支持音频播放。
+                                                                </audio>
+                                                            </div>
+                                                        {% elif evidence.evidence_type == 'video' %}
+                                                            <div class="evidence-file video">
+                                                                {% set video_src = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <video width="100%" controls>
+                                                                    <source src="{{ video_src }}" type="video/mp4">
+                                                                    您的浏览器不支持视频播放。
+                                                                </video>
+                                                            </div>
+                                                        {% elif evidence.evidence_type == 'file' %}
+                                                            <div class="evidence-file file">
+                                                                {% set file_href = evidence.file_path if evidence.file_path and evidence.file_path.startswith('http') else url_for('uploaded_file', filename=evidence.file_path) %}
+                                                                <a href="{{ file_href }}" target="_blank">📎 下载文件</a>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    
+                                                    <!-- 法律注释 -->
+                                                    {% if evidence.legal_notes %}
+                                                        <div class="legal-notes">
+                                                            {% for note in evidence.legal_notes %}
+                                                                <div class="legal-note-item">
+                                                                    <div class="legal-article">{{ note.legal_article }}</div>
+                                                                    <div>{{ note.note_content }}</div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    
+                                                    <div class="evidence-actions">
+                                                        {% if current_user.is_authenticated %}
+                                                            <!-- 标记关键证据 -->
+                                                            {% if current_user.id == evidence.submitter_id or current_user.id == case.initiator_id %}
+                                                                <form method="POST" action="/mark_key_evidence/{{ evidence.id }}" style="display: inline;">
+                                                                    <button type="submit" class="action-btn {{ 'active' if evidence.is_key else '' }}">
+                                                                        ⭐ {{ '已标记' if evidence.is_key else '标记关键' }}
+                                                                    </button>
+                                                                </form>
+                                                            {% endif %}
+                                                            
+                                                            <!-- 点赞证据 -->
+                                                            <form method="POST" action="/like_evidence/{{ evidence.id }}" style="display: inline;" onclick="event.stopPropagation()">
+                                                                <button type="submit" class="action-btn" onclick="event.stopPropagation()">
+                                                                    👍 {{ evidence.likes }}
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-content">暂无可见的证据</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 提交证据表单 -->
+            {% if current_user.is_authenticated %}
+                <div class="submit-evidence-form" style="position: relative;">
+                    {% if current_user.id == case.initiator_id %}
+                        <div style="position:absolute; top:0; right:0;">
+                            <button type="button" onclick="toggleEllipsisMenu(event, 'menu-case-{{case.id}}')" style="background:none; border:none; font-size:16px; color:#333; cursor:pointer;">···</button>
+                            <div id="menu-case-{{case.id}}" style="position:absolute; right:0; top:24px; display:none; background:#fff; border:1px solid #eee; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1); min-width:120px;">
+                                <button type="button" class="menu-item delete-action" data-delete-url="/api/delete_case/{{ case.id }}" style="background:none; border:none; padding:8px 12px; width:100%; text-align:left; cursor:pointer;">删除</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <h4>提交证据</h4>
+                    <form method="POST" action="/submit_evidence/{{ case.id }}" enctype="multipart/form-data">
+                        {% if case.case_type == 'general' %}
+                            <div class="form-row">
+                                <div class="form-group col-support">
+                                    <label for="submit-to">支持</label>
+                                    <select id="submit-to" name="submit_to" required>
+                                        <option value="initiator">发起方</option>
+                                        <option value="opponent">对峙方</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-type">
+                                    <label for="evidence-type">证据类型</label>
+                                    <select id="evidence-type" name="evidence_type" required onchange="toggleFileTypeSelection(this.value)">
+                                        <option value="image">图片</option>
+                                        <option value="audio">音频</option>
+                                        <option value="video">视频</option>
+                                        <option value="file">文件</option>
+                                    </select>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="form-group">
+                                <label for="evidence-type">证据类型</label>
+                                <select id="evidence-type" name="evidence_type" required onchange="toggleFileTypeSelection(this.value)">
+                                    <option value="image">图片</option>
+                                    <option value="audio">音频</option>
+                                    <option value="video">视频</option>
+                                    <option value="file">文件</option>
+                                </select>
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="evidence-file">上传证据文件</label>
+                            <input type="file" id="evidence-file" name="evidence_file" required accept="">
+                            <img id="image-preview" class="evidence-preview" alt="预览">
+                        </div>
+                        <div class="form-group">
+                            <label for="evidence-content">描述文本 <span style="color:red;">*</span></label>
+                            <textarea id="evidence-content" name="content" placeholder="请输入证据描述" required></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="is-key" name="is_key">
+                            <label for="is-key">标记为关键证据</label>
+                        </div>
+                        {% if case.case_type == 'civil' and current_user.id == case.initiator_id and not opponent_evidences %}
+                            <div class="form-check">
+                                <input type="checkbox" id="is-proxy" name="is_proxy">
+                                <label for="is-proxy">代对峙方举证</label>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn">提交证据</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 时间线 -->
+        <div class="timeline-section">
+            <h3 class="section-title">事件时间线</h3>
+            {% if case.timeline %}
+                {% for event in case.timeline %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-description">{{ event.description }}</div>
+                            <div class="timeline-time">{{ event.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-content">暂无时间线记录</div>
+            {% endif %}
+        </div>
+
+        <!-- 左右对抗式PK进度条，在证据下方 -->
+            <div class="pk-section" onclick="toggleCommentSection()">
+                <div class="pk-label">支持率对比（点击查看讨论）</div>
+                <div class="pk-container">
+                    {% set total_support = support_counts.initiator + support_counts.opponent %}
+                    {% set initiator_percent = support_percentages.initiator|round(1) %}
+                    {% set opponent_percent = support_percentages.opponent|round(1) %}
+                    <div class="pk-left" id="pk-left" style="width: {{initiator_percent}}%; ">
+                        {{initiator_percent}}%
+                    </div>
+                    <div class="pk-right" id="pk-right" style="width: {{opponent_percent}}%; ">
+                        {{opponent_percent}}%
+                    </div>
+                </div>
+                <div class="pk-stats">
+                    <div id="pk-initiator-count">发起方: {{ support_counts.initiator }} 人</div>
+                    <div id="pk-opponent-count">对峙方: {{ support_counts.opponent }} 人</div>
+                </div>
+                
+                <!-- 支持按钮 -->
+                <div class="support-buttons">
+                    {% if current_user.is_authenticated %}
+                        <button onclick="handleSupport('{{ case.id }}','initiator')" class="support-btn {{ 'active' if user_support == 'initiator' else '' }}" {{ 'disabled' if user_support else '' }}>支持发起方</button>
+                        <button onclick="handleSupport('{{ case.id }}','opponent')" class="support-btn {{ 'active' if user_support == 'opponent' else '' }}" {{ 'disabled' if user_support else '' }}>支持对峙方</button>
+                        {% if user_support %}
+                            <div style="margin-top:8px; font-size: 13px; color:#666;">已选择支持方：{{ '发起方' if user_support=='initiator' else '对峙方' }}（不可更改）</div>
+                        {% endif %}
+                    {% else %}
+                        <p>请先<a href="/login">登录</a>后参与支持</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 评论区 -->
+            <div class="comment-section {{ 'active' if user_support else '' }}" id="comment-section">
+                <h3 class="section-title">讨论评论</h3>
+            
+            <!-- 评论表单 -->
+            {% if current_user.is_authenticated %}
+                {% if can_comment and user_support %}
+                    <div class="comment-form">
+                        <form method="POST" action="/add_comment/{{ case.id }}" id="comment-form">
+                            <div class="form-group">
+                                <label for="comment-content">发表评论</label>
+                                <textarea id="comment-content" name="content" required placeholder="请输入您的评论，请勿发布不当言论"></textarea>
+                                <div id="sensitive-warning" class="sensitive-warning" style="display: none;"></div>
+                            </div>
+                            <button type="submit" class="btn">发表评论</button>
+                        </form>
+                    </div>
+                {% elif not user_support %}
+                    <div class="error-message">
+                        <strong>提示：</strong>请先通过上方PK条选择支持某一方后再发表评论
+                    </div>
+                {% else %}
+                    <div class="error-message">
+                        <strong>提示：</strong>民事案件需要双方都提交证据后才能发表评论
+                    </div>
+                {% endif %}
+            {% else %}
+                <p>请先<a href="/login">登录</a>后发表评论</p>
+            {% endif %}
+            
+            <!-- 评论列表 -->
+            <div class="comment-list">
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="comment-item {{ 'blocked-comment' if comment.is_blocked else '' }}" style="position: relative;">
+                            {% if current_user.is_authenticated and current_user.id == comment.author_id %}
+                            <div style="position:absolute; top:8px; right:8px;">
+                                <button type="button" onclick="toggleEllipsisMenu(event, 'menu-cmt-{{comment.id}}')" style="background:none; border:none; font-size:14px; color:#333; cursor:pointer;">···</button>
+                                <div id="menu-cmt-{{comment.id}}" style="position:absolute; right:0; top:24px; display:none; background:#fff; border:1px solid #eee; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1); min-width:120px;">
+                                    <button type="button" class="menu-item delete-action" data-delete-url="/api/delete_comment/{{ comment.id }}" style="background:none; border:none; padding:8px 12px; width:100%; text-align:left; cursor:pointer;">删除</button>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="comment-header">
+                                <div class="comment-author">{{ comment.author.username }}{% if comment_support_map and comment_support_map.get(comment.author.id) %}<span class="support-badge {{ 'initiator' if comment_support_map.get(comment.author.id)=='initiator' else 'opponent' }}">支持{{ '发起方' if comment_support_map.get(comment.author.id)=='initiator' else '对峙方' }}</span>{% endif %}</div>
+                                <div class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                            </div>
+                            {% if comment.is_blocked %}
+                                <div class="comment-content">该评论因包含不当内容已被屏蔽。</div>
+                            {% else %}
+            {# 显示处理后的内容（优先 processed_content），保证只做局部替换 #}
+            <div class="comment-content">{{ comment.processed_content or comment.content }}</div>
+                            {% endif %}
+                            {% if current_user.is_authenticated and not comment.is_blocked %}
+                                <div class="comment-actions">
+                                    <form method="POST" action="/like_comment/{{ comment.id }}" style="display: inline;">
+                                        <button type="submit" class="action-btn">
+                                            👍 {{ comment.likes }}
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-content">暂无评论</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 调解协议（仅民事案件） -->
+        {% if case.case_type == 'civil' and current_user.is_authenticated %}
+            <div class="agreement-section">
+                <h3 class="section-title">调解协议</h3>
+                
+                {% if mediation_agreement %}
+                    <div class="agreement-status">
+                    {% if mediation_agreement.initiator_signed and mediation_agreement.opponent_signed %}
+                        <div class="status-signed">✅ 双方已确认事实并签署调解协议</div>
+                    {% else %}
+                        <div class="status-pending">⏳ 等待签署调解协议
+                            {% if mediation_agreement.initiator_confirmed %}
+                                <br>✓ 发起方已确认案件事实
+                            {% else %}
+                                <br>✗ 发起方待确认案件事实
+                            {% endif %}
+                            {% if mediation_agreement.opponent_confirmed %}
+                                <br>✓ 对峙方已确认案件事实
+                            {% else %}
+                                <br>✗ 对峙方待确认案件事实
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                    
+                    {% if current_user.id == case.initiator_id or (case.opponent_id and current_user.id == case.opponent_id) %}
+                        <div class="agreement-content" id="agreement-rendered"></div>
+                        <div id="agreement-markdown" style="display:none; white-space: pre-wrap;">{{ mediation_agreement.content }}</div>
+                        <div class="agreement-actions">
+                            {% if not (mediation_agreement.initiator_signed and mediation_agreement.opponent_signed) %}
+                                <button id="edit-agreement-btn" class="btn btn-primary" type="button">编辑协议文本</button>
+                                <form id="save-agreement-form" method="POST" action="/update_agreement/{{ mediation_agreement.id }}" style="display:none; gap: 10px; align-items: center;">
+                                    <textarea name="content" id="agreement-content-textarea" style="display:none;"></textarea>
+                                    <button id="save-agreement-btn" class="btn btn-success" type="submit">保存修改</button>
+                                    <button id="cancel-edit-btn" class="btn btn-secondary" type="button">取消编辑</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="no-content">仅签署双方可查看调解协议的具体内容</div>
+                    {% endif %}
+                    
+                    <!-- 需要双方确认后才能签署 -->
+                    {% if not mediation_agreement.initiator_signed or not mediation_agreement.opponent_signed %}
+                        {% if current_user.id == case.initiator_id and not mediation_agreement.initiator_signed %}
+                            <form id="sign-form-init" method="POST" action="/sign_agreement/{{ mediation_agreement.id }}">
+                                <div class="form-check" style="margin: 15px 0;">
+                                    <input type="checkbox" id="confirm-facts-init" name="confirm_facts" required>
+                                    <label for="confirm-facts-init">我确认上述案件事实无误</label>
+                                </div>
+                                <input type="hidden" name="signature_data" id="signature-data-init" />
+                                <button type="button" class="btn btn-success" onclick="openSignatureModal('init')">确认事实并签署</button>
+                            </form>
+                        {% elif current_user.id == case.opponent_id and not mediation_agreement.opponent_signed %}
+                            <form id="sign-form-opp" method="POST" action="/sign_agreement/{{ mediation_agreement.id }}">
+                                <div class="form-check" style="margin: 15px 0;">
+                                    <input type="checkbox" id="confirm-facts-opp" name="confirm_facts" required>
+                                    <label for="confirm-facts-opp">我确认上述案件事实无误</label>
+                                </div>
+                                <input type="hidden" name="signature_data" id="signature-data-opp" />
+                                <button type="button" class="btn btn-success" onclick="openSignatureModal('opp')">确认事实并签署</button>
+                            </form>
+                        {% else %}
+                            <div class="form-check" style="margin: 15px 0; opacity: 0.6;">
+                                <input type="checkbox" id="confirm-facts" disabled>
+                                <label for="confirm-facts">我确认上述案件事实无误</label>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    {% if current_user.id == case.initiator_id or (case.opponent_id and current_user.id == case.opponent_id) %}
+                        <div class="success-message">
+                            <strong>提示：</strong>双方可以通过调解协议解决纠纷
+                        </div>
+                        <form method="POST" action="/generate_agreement/{{ case.id }}">
+                            <div class="btn-container" style="text-align: center;">
+                                <button type="submit" class="btn btn-success">生成AI智能总结的调解协议</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="no-content">
+                            仅案件当事人可生成调解协议
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // 自动关闭flash消息
+        setTimeout(() => {
+            const flashes = document.querySelectorAll('.flash');
+            flashes.forEach(flash => {
+                flash.style.opacity = '0';
+                flash.style.transform = 'translateX(100%)';
+                flash.style.transition = 'opacity 0.3s, transform 0.3s';
+                setTimeout(() => flash.remove(), 300);
+            });
+        }, 3000);
+        
+        // 点击PK条后显示评论区
+        function toggleCommentSection() {
+            const commentSection = document.getElementById('comment-section');
+            commentSection.classList.toggle('active');
+        }
+        
+        // 切换证据类别显示
+        function toggleCategory(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('span:last-child');
+            content.classList.toggle('active');
+            icon.textContent = content.classList.contains('active') ? '▲' : '▼';
+        }
+        
+        // 切换文件类型选择和预览
+        function toggleFileTypeSelection(type) {
+            const fileInput = document.getElementById('evidence-file');
+            const imagePreview = document.getElementById('image-preview');
+            
+            // 清空预览
+            imagePreview.classList.remove('active');
+            
+            // 设置文件类型限制
+            switch(type) {
+                case 'image':
+                    fileInput.accept = 'image/*';
+                    break;
+                case 'audio':
+                    fileInput.accept = 'audio/*';
+                    break;
+                case 'video':
+                    fileInput.accept = 'video/*';
+                    break;
+                case 'file':
+                    fileInput.accept = '';
+                    break;
+            }
+        }
+        
+        // 图片预览功能
+        document.getElementById('evidence-file')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const imagePreview = document.getElementById('image-preview');
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.src = event.target.result;
+                    imagePreview.classList.add('active');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.classList.remove('active');
+            }
+        });
+
+        // 调解协议编辑逻辑（使用隐藏textarea编辑Markdown）
+        (function() {
+            const renderedEl = document.getElementById('agreement-rendered');
+            const mdEl = document.getElementById('agreement-markdown');
+            const editBtn = document.getElementById('edit-agreement-btn');
+            const saveForm = document.getElementById('save-agreement-form');
+            const cancelBtn = document.getElementById('cancel-edit-btn');
+            const textarea = document.getElementById('agreement-content-textarea');
+
+            if (!renderedEl || !mdEl || !editBtn || !textarea || !saveForm) return;
+
+            let editing = false;
+
+            function enterEditMode() {
+                if (editing) return;
+                editing = true;
+                textarea.value = mdEl.textContent || '';
+                renderedEl.style.display = 'none';
+                textarea.style.display = 'block';
+                editBtn.style.display = 'none';
+                saveForm.style.display = 'inline-flex';
+                textarea.focus();
+            }
+
+            function exitEditMode() {
+                editing = false;
+                renderedEl.style.display = '';
+                textarea.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+                saveForm.style.display = 'none';
+            }
+
+            editBtn.addEventListener('click', enterEditMode);
+            cancelBtn && cancelBtn.addEventListener('click', function() {
+                if (!editing) return;
+                exitEditMode();
+            });
+            saveForm && saveForm.addEventListener('submit', function() {
+                if (!editing) return;
+                // 提交后端的是Markdown文本
+                mdEl.textContent = textarea.value;
+                exitEditMode();
+            });
+        })();
+
+        // Markdown 渲染（使用 marked），在DOM加载后执行，确保库已就绪
+        document.addEventListener('DOMContentLoaded', function() {
+            const md = document.getElementById('agreement-markdown');
+            const rendered = document.getElementById('agreement-rendered');
+            if (!md || !rendered) return;
+            function renderMarkdown() {
+                rendered.innerHTML = marked.parse(md.textContent || '');
+            }
+            if (window.marked) {
+                renderMarkdown();
+            } else {
+                // 动态加载 marked 库
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+                script.onload = renderMarkdown;
+                script.onerror = function() {
+                    // 后备：简单替换常见Markdown标记
+                    let txt = md.textContent || '';
+                    txt = txt.replace(/^#\s*(.*)$/gm, '<h3>$1</h3>');
+                    txt = txt.replace(/^##\s*(.*)$/gm, '<h4>$1</h4>');
+                    txt = txt.replace(/^\*\s*(.*)$/gm, '<li>$1</li>');
+                    rendered.innerHTML = txt;
+                };
+                document.head.appendChild(script);
+            }
+        });
+
+        // 支持操作 AJAX
+        async function handleSupport(caseId, side) {
+            const btns = document.querySelectorAll('.support-btn');
+            if ([...btns].some(b => b.classList.contains('active'))) {
+                alert('您已选择支持方，无法更改');
+                return;
+            }
+            try {
+                const res = await fetch(`/api/support/${caseId}/${side}`, { method: 'POST' });
+                if (!res.ok) throw new Error('支持失败');
+                const data = await res.json();
+                if (data && data.error === 'locked') {
+                    alert('您已选择支持方，无法更改');
+                    return;
+                }
+                updatePkBar(data);
+                const commentSection = document.getElementById('comment-section');
+                commentSection && commentSection.classList.add('active');
+                btns.forEach(b => b.setAttribute('disabled','disabled'));
+            } catch (e) {
+                console.error(e);
+                alert('支持操作失败，请稍后重试');
+            }
+        }
+
+        async function refreshSupport(caseId) {
+            try {
+                const res = await fetch(`/api/support_counts/${caseId}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                updatePkBar(data);
+            } catch {}
+        }
+
+        function updatePkBar(data) {
+            const left = document.getElementById('pk-left');
+            const right = document.getElementById('pk-right');
+            const initCount = document.getElementById('pk-initiator-count');
+            const oppCount = document.getElementById('pk-opponent-count');
+            if (!left || !right || !initCount || !oppCount) return;
+            left.style.width = `${data.initiator_percent}%`;
+            left.textContent = `${data.initiator_percent}%`;
+            right.style.width = `${data.opponent_percent}%`;
+            right.textContent = `${data.opponent_percent}%`;
+            initCount.textContent = `发起方: ${data.initiator_supports} 人`;
+            oppCount.textContent = `对峙方: ${data.opponent_supports} 人`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshSupport('{{ case.id }}');
+        });
+
+        function toggleEllipsisMenu(e, id) {
+            e.stopPropagation();
+            const menu = document.getElementById(id);
+            if (!menu) return;
+            const visible = menu.style.display === 'block';
+            menu.style.display = visible ? 'none' : 'block';
+            document.addEventListener('click', function handler(ev){
+                const target = ev.target;
+                if (!menu.contains(target)) {
+                    menu.style.display = 'none';
+                    document.removeEventListener('click', handler);
+                }
+            });
+        }
+
+        let __delete_url = null;
+        function openDeleteConfirm(url){
+            __delete_url = url;
+            const modal = document.getElementById('confirm-delete-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+        function cancelDelete(){
+            const modal = document.getElementById('confirm-delete-modal');
+            if (modal) modal.style.display = 'none';
+            __delete_url = null;
+        }
+        function confirmDelete(){
+            if (!__delete_url) return;
+            const form = document.getElementById('delete-confirm-form');
+            if (!form) return;
+            form.action = __delete_url;
+            form.submit();
+        }
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('.delete-action').forEach(btn => {
+                btn.addEventListener('click', function(){
+                    const url = this.getAttribute('data-delete-url');
+                    openDeleteConfirm(url);
+                });
+            });
+        });
+
+        // 电子签名弹窗
+        let sigCtx, drawing = false, sigCanvas, currentSignRole = null;
+        function openSignatureModal(role) {
+            currentSignRole = role; // 'init' | 'opp'
+            const modal = document.createElement('div');
+            modal.id = 'signature-modal';
+            modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; display:flex; align-items:center; justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:520px;">
+                    <h3 style="margin-top:0;">电子签名</h3>
+                    <canvas id="signature-canvas" width="480" height="200" style="border:1px solid #ccc; border-radius:6px; display:block; margin-bottom:12px;"></canvas>
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button class="btn" id="sig-clear">清除</button>
+                        <button class="btn btn-secondary" id="sig-cancel">取消</button>
+                        <button class="btn btn-success" id="sig-confirm">确认签名</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+            sigCanvas = document.getElementById('signature-canvas');
+            sigCtx = sigCanvas.getContext('2d');
+            sigCtx.strokeStyle = '#111';
+            sigCtx.lineWidth = 2;
+            sigCtx.lineCap = 'round';
+            // 绑定事件
+            sigCanvas.onmousedown = (e) => { drawing = true; sigCtx.beginPath(); sigCtx.moveTo(e.offsetX, e.offsetY); };
+            sigCanvas.onmousemove = (e) => { if (drawing) { sigCtx.lineTo(e.offsetX, e.offsetY); sigCtx.stroke(); } };
+            window.onmouseup = () => { drawing = false; };
+            // 触摸兼容
+            sigCanvas.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; const rect=sigCanvas.getBoundingClientRect(); drawing=true; sigCtx.beginPath(); sigCtx.moveTo(t.clientX-rect.left, t.clientY-rect.top); }, {passive:true});
+            sigCanvas.addEventListener('touchmove', (e)=>{ const t=e.touches[0]; const rect=sigCanvas.getBoundingClientRect(); if(drawing){ sigCtx.lineTo(t.clientX-rect.left, t.clientY-rect.top); sigCtx.stroke(); } }, {passive:true});
+            window.addEventListener('touchend', ()=>{ drawing=false; }, {once:true});
+            // 控制按钮
+            document.getElementById('sig-clear').onclick = function(){ sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height); };
+            document.getElementById('sig-cancel').onclick = function(){ document.body.removeChild(modal); };
+            document.getElementById('sig-confirm').onclick = function(){
+                const dataUrl = sigCanvas.toDataURL('image/png');
+                if (currentSignRole === 'init') {
+                    document.getElementById('signature-data-init').value = dataUrl;
+                    document.getElementById('sign-form-init').submit();
+                } else {
+                    document.getElementById('signature-data-opp').value = dataUrl;
+                    document.getElementById('sign-form-opp').submit();
+                }
+                document.body.removeChild(modal);
+            };
+        }
+
+        // 保持滚动位置：提交点赞/评论/标记等操作后不回到顶部
+        (function() {
+            const key = `scrollY_case_${'{{ case.id }}'}`;
+            function saveScroll() {
+                try { sessionStorage.setItem(key, String(window.scrollY || window.pageYOffset || 0)); } catch (e) {}
+            }
+            function restoreScroll() {
+                try {
+                    const v = sessionStorage.getItem(key);
+                    if (v !== null) {
+                        const y = parseInt(v, 10);
+                        if (!isNaN(y)) {
+                            window.scrollTo(0, y);
+                        }
+                        sessionStorage.removeItem(key);
+                    }
+                } catch (e) {}
+            }
+            window.addEventListener('beforeunload', saveScroll);
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                if (!(form instanceof HTMLFormElement)) return;
+                const action = (form.getAttribute('action') || '');
+                if (
+                    action.includes('/like_evidence/') ||
+                    action.includes('/like_comment/') ||
+                    action.includes('/add_comment/') ||
+                    action.includes('/mark_key_evidence/') ||
+                    action.includes('/delete_comment/') ||
+                    action.includes('/delete_evidence/') ||
+                    action.includes('/submit_evidence/')
+                ) {
+                    saveScroll();
+                }
+            }, true);
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                if (!(target instanceof Element)) return;
+                const btn = target.closest('button, a');
+                if (!btn) return;
+                const form = btn.closest('form');
+                if (form) {
+                    const action = (form.getAttribute('action') || '');
+                    if (
+                        action.includes('/like_evidence/') ||
+                        action.includes('/like_comment/') ||
+                        action.includes('/add_comment/') ||
+                        action.includes('/mark_key_evidence/') ||
+                        action.includes('/delete_comment/') ||
+                        action.includes('/delete_evidence/') ||
+                        action.includes('/submit_evidence/')
+                    ) {
+                        saveScroll();
+                    }
+                }
+            }, true);
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', restoreScroll, { once: true });
+            } else {
+                restoreScroll();
+            }
+        })();
+    </script>
+<!-- 证据详情模态框 -->
+    <div id="evidenceModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>证据详情</h3>
+                <button onclick="closeEvidenceModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="evidenceDetails" style="margin-bottom: 20px;">
+                <!-- 证据详情将通过JavaScript动态加载 -->
+            </div>
+            <div class="modal-footer" style="text-align: right;">
+                <button onclick="closeEvidenceModal()" style="background: #ccc; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 查看证据详情
+        function viewEvidenceDetails(evidenceId) {
+            // 显示模态框
+            const modal = document.getElementById('evidenceModal');
+            const detailsContainer = document.getElementById('evidenceDetails');
+            
+            // 显示加载中
+            detailsContainer.innerHTML = `<p>正在加载证据详情...</p>`;
+            modal.style.display = 'flex';
+            
+            // 通过AJAX获取证据详情
+            fetch(`/api/evidence/${evidenceId}`, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                .then(response => {
+                    if (response.ok) return response.json();
+                    const statusMsg = response.status === 401
+                        ? '请先登录后查看该证据'
+                        : response.status === 403
+                        ? '无权查看该证据'
+                        : response.status === 404
+                        ? '证据不存在'
+                        : `HTTP ${response.status}`;
+                    return response.text()
+                        .then(txt => {
+                            try {
+                                const err = JSON.parse(txt);
+                                throw new Error(err.error || statusMsg);
+                            } catch (_) {
+                                throw new Error(statusMsg);
+                            }
+                        });
+                })
+                .then(data => {
+                    // 渲染证据详情
+                    let fileContent = '';
+                    if (data.file_path) {
+                        const fp = data.file_path || '';
+                        let fileUrl = fp;
+                        if (!fp.startsWith('http')) {
+                            if (fp.startsWith('/uploads/')) {
+                                fileUrl = fp;
+                            } else {
+                                fileUrl = `/uploads/${fp}`;
+                            }
+                        }
+                        function guessMime(ft, kind) {
+                            const t = (ft || '').toLowerCase();
+                            if (kind === 'audio') {
+                                if (t.includes('mp3') || t === 'mpeg') return 'audio/mpeg';
+                                if (t.includes('wav')) return 'audio/wav';
+                                if (t.includes('m4a') || t.includes('aac') || t.includes('mp4')) return 'audio/mp4';
+                                if (t.includes('ogg')) return 'audio/ogg';
+                                return '';
+                            }
+                            if (kind === 'video') {
+                                if (t.includes('mp4')) return 'video/mp4';
+                                if (t.includes('webm')) return 'video/webm';
+                                if (t.includes('mov') || t.includes('quicktime')) return 'video/quicktime';
+                                return '';
+                            }
+                            if (kind === 'image') {
+                                if (t.includes('jpeg') || t.includes('jpg')) return 'image/jpeg';
+                                if (t.includes('png')) return 'image/png';
+                                if (t.includes('gif')) return 'image/gif';
+                                return '';
+                            }
+                            return '';
+                        }
+                        switch(data.evidence_type) {
+                            case 'image':
+                                fileContent = `<div class="evidence-file-detail image">
+                                    <img src="${fileUrl}" alt="证据图片" style="max-width:100%; max-height:400px;">
+                                </div>`;
+                                break;
+                            case 'audio':
+                                fileContent = `<div class="evidence-file-detail audio">
+                                    <audio controls style="width:100%;">
+                                        <source src="${fileUrl}" ${guessMime(data.file_type, 'audio') ? `type="${guessMime(data.file_type, 'audio')}"` : ''}>
+                                        您的浏览器不支持音频播放。
+                                    </audio>
+                                </div>`;
+                                break;
+                            case 'video':
+                                fileContent = `<div class="evidence-file-detail video">
+                                    <video width="100%" controls>
+                                        <source src="${fileUrl}" ${guessMime(data.file_type, 'video') ? `type="${guessMime(data.file_type, 'video')}"` : ''}>
+                                        您的浏览器不支持视频播放。
+                                    </video>
+                                </div>`;
+                                break;
+                            case 'file':
+                                fileContent = `<div class="evidence-file-detail file">
+                                    <a href="${fileUrl}" target="_blank">
+                                        <button style="padding:10px 20px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">
+                                            查看文件
+                                        </button>
+                                    </a>
+                                </div>`;
+                                break;
+                        }
+                    }
+                    
+                    detailsContainer.innerHTML = `
+                        <div class="evidence-detail-info">
+                            <div class="detail-row">
+                                <strong>提交者：</strong>${data.submitter_name}
+                            </div>
+                            <div class="detail-row">
+                                <strong>提交时间：</strong>${data.created_at}
+                            </div>
+                            <div class="detail-row">
+                                <strong>证据类型：</strong>${
+                                    data.evidence_type === 'image' ? '图片' :
+                                    data.evidence_type === 'audio' ? '音频' :
+                                    data.evidence_type === 'video' ? '视频' :
+                                    data.evidence_type === 'file' ? '文件' : '文本'
+                                }
+                            </div>
+                            <div class="detail-row">
+                                <strong>证据状态：</strong>
+                                <span class="evidence-status" style="
+                                    padding:2px 8px; 
+                                    border-radius:4px; 
+                                    background:${data.status === 'complete' ? '#d4edda' : '#f8d7da'};
+                                    color:${data.status === 'complete' ? '#155724' : '#721c24'};
+                                ">
+                                    ${data.status === 'complete' ? '完整' : '不完整'}
+                                </span>
+                            </div>
+                            ${data.is_key ? '<div class="detail-row"><strong>标记：</strong>关键证据</div>' : ''}
+                            ${data.is_proxy ? '<div class="detail-row"><strong>标记：</strong>代举证</div>' : ''}
+                            <div class="detail-row">
+                                <strong>点赞数：</strong>${data.likes}
+                            </div>
+                        </div>
+                        
+                        ${data.content ? `
+                        <div class="evidence-detail-content">
+                            <h4>证据描述</h4>
+                            <p>${data.content}</p>
+                        </div>
+                        ` : ''}
+                        
+                        ${fileContent}
+                    `;
+                })
+                .catch(error => {
+                    const msg = error && error.message ? error.message : '未知错误';
+                    const loginHint = msg.includes('登录') ? `
+                        <div style="margin-top:12px;">
+                            <a href="/login" target="_blank">
+                                <button style="padding:8px 16px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">去登录</button>
+                            </a>
+                        </div>
+                    ` : '';
+                    detailsContainer.innerHTML = `<p class="error">获取证据详情失败：${msg}</p>${loginHint}`;
+                });
+        }
+        
+        // 关闭证据详情模态框
+        function closeEvidenceModal() {
+            document.getElementById('evidenceModal').style.display = 'none';
+        }
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('evidenceModal');
+            if (event.target == modal) {
+                closeEvidenceModal();
+            }
+        }
+        
+        // 实时敏感词检测功能
+        let sensitiveCheckTimeout;
+        const commentTextarea = document.getElementById('comment-content');
+        const sensitiveWarning = document.getElementById('sensitive-warning');
+        
+        if (commentTextarea) {
+            commentTextarea.addEventListener('input', function() {
+                clearTimeout(sensitiveCheckTimeout);
+                const content = this.value;
+                
+                if (content.length === 0) {
+                    sensitiveWarning.style.display = 'none';
+                    return;
+                }
+                
+                // 延迟检测，避免频繁请求
+                sensitiveCheckTimeout = setTimeout(() => {
+                    fetch('/api/detect-sensitive-words', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ content: content })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.has_sensitive) {
+                            sensitiveWarning.innerHTML = `
+                                <div class="sensitive-warning-content">
+                                    <span class="warning-icon">⚠️</span>
+                                    <span class="warning-text">${data.message}</span>
+                                </div>
+                            `;
+                            sensitiveWarning.style.display = 'block';
+                        } else {
+                            sensitiveWarning.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('敏感词检测失败:', error);
+                        sensitiveWarning.style.display = 'none';
+                    });
+                }, 500); // 500ms延迟
+            });
+        }
+    </script>
+    <div id="confirm-delete-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:360px;">
+            <div style="font-size:16px; margin-bottom:16px;">您确认删除吗？</div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn btn-secondary" type="button" onclick="cancelDelete()">取消</button>
+                <form id="delete-confirm-form" method="POST" style="display:inline;">
+                    {% if current_user.is_authenticated %}
+                        <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                    {% endif %}
+                </form>
+                <button class="btn btn-danger" type="button" onclick="confirmDelete()">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* 敏感词警告样式 */
+        .sensitive-warning {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            color: #856404;
+            font-size: 14px;
+        }
+        
+        .sensitive-warning-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .warning-icon {
+            font-size: 16px;
+        }
+        
+        .warning-text {
+            flex: 1;
+        }
+        
+        /* 输入框焦点状态 */
+        #comment-content:focus {
+            border-color: #ff4757;
+            box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.2);
+        }
+
+        /* 评论中“支持发起方/对峙方”彩色标签 */
+        .support-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 6px;
+            color: #fff;
+            line-height: 1.2;
+        }
+        .support-badge.initiator { background: #d32f2f; }
+        .support-badge.opponent { background: #1976d2; }
+    </style>
+    </body>
+</html>

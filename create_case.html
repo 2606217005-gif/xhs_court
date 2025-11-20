@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发起案件 - 小红书法庭</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #ff4757;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+        nav a::before {
+            content: '←';
+            margin-right: 5px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #ff4757;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #ff4757;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.1);
+        }
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        .case-type-selection {
+            display: flex;
+            gap: 20px;
+        }
+        .case-type-option {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .case-type-option:hover {
+            border-color: #ff4757;
+        }
+        .case-type-option.selected {
+            border-color: #ff4757;
+            background-color: #fff5f5;
+        }
+        .case-type-option input[type="radio"] {
+            display: none;
+        }
+        .case-type-option label {
+            cursor: pointer;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .case-type-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .btn {
+            background: #ff4757;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #ff3838;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .form-hint {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .warning-box h4 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .warning-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .flash {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <header>
+        <h1>小红书法庭</h1>
+    </header>
+
+    <nav>
+        <a href="/">返回首页</a>
+    </nav>
+
+    <div class="container">
+        <h2>发起新案件</h2>
+        
+        <div class="warning-box">
+            <h4>⚠️ 发起案件前请阅读</h4>
+            <ul>
+                <li>请确保提供真实、准确的信息</li>
+                <li>系统将自动对您提交的信息进行隐私保护处理</li>
+                <li><strong>重要：发起案件时必须同时提交至少一个证据，否则无法创建案件</strong></li>
+            </ul>
+        </div>
+        
+        <form method="POST" action="/create_case" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">案件标题</label>
+                <input type="text" id="title" name="title" required placeholder="请简要描述您的案件" maxlength="200">
+                <div class="form-hint">请使用简洁明了的标题，便于他人理解</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="case_type">案件类型</label>
+                <div class="case-type-selection">
+                    <div class="case-type-option" onclick="selectCaseType('civil')">
+                        <input type="radio" id="type-civil" name="case_type" value="civil" required>
+                        <label for="type-civil">民事案件</label>
+                        <div class="case-type-description">
+                            涉及特定当事人之间的纠纷，如合同纠纷、侵权赔偿等。
+                            仅案件当事人可提交证据，双方举证后开放评论。
+                        </div>
+                    </div>
+                    <div class="case-type-option" onclick="selectCaseType('general')">
+                        <input type="radio" id="type-general" name="case_type" value="general" required>
+                        <label for="type-general">泛式讨论</label>
+                        <div class="case-type-description">
+                            针对某一观点或事件的开放性讨论。
+                            任何用户均可参与举证和评论，点赞影响内容排序。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">案件描述</label>
+                <textarea id="description" name="description" required placeholder="请详细描述事件经过、您的诉求等信息"></textarea>
+                <div class="form-hint">请尽可能详细地描述事实，这将帮助我们更好地理解您的案件</div>
+            </div>
+            
+            <h3 style="color: #ff4757; margin-top: 40px; margin-bottom: 20px;">提交证据（必填）</h3>
+            
+            <div class="form-group">
+                <label for="evidence_type">证据类型</label>
+                <select id="evidence_type" name="evidence_type" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                    <option value="text">文本描述</option>
+                    <option value="image">图片</option>
+                    <option value="audio">音频</option>
+                    <option value="video">视频</option>
+                    <option value="file">文件</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="evidence_content">证据描述</label>
+                <textarea id="evidence_content" name="evidence_content" placeholder="请描述您的证据内容、来源等信息"></textarea>
+                <div class="form-hint">即使上传文件，也请提供简要描述以帮助他人理解</div>
+            </div>
+            
+            <div class="form-group" id="file-upload-container">
+                <label for="evidence_file">上传文件（图片、音频、视频或文档）</label>
+                <input type="file" id="evidence_file" name="evidence_file" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                <div class="form-hint">支持的文件类型：图片(png,jpg,jpeg,gif,webp)、音频(mp3,wav,ogg,m4a)、视频(mp4,avi,mov,wmv)、文档(pdf,doc,docx,txt,xlsx,pptx)</div>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center;">
+                <input type="checkbox" id="is_key" name="is_key" style="width: auto; margin-right: 10px;">
+                <label for="is_key" style="display: inline; margin-bottom: 0;">标记为关键证据</label>
+            </div>
+            
+            <div class="btn-container">
+                <button type="submit" class="btn">提交案件</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 选择案件类型
+        function selectCaseType(type) {
+            // 移除所有选中状态
+            document.querySelectorAll('.case-type-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            // 添加选中状态
+            const selectedOption = document.querySelector(`.case-type-option:has(#type-${type})`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            // 选中对应的单选按钮
+            document.getElementById(`type-${type}`).checked = true;
+        }
+        
+        // 根据证据类型显示或隐藏文件上传
+        document.getElementById('evidence_type').addEventListener('change', function() {
+            const fileUploadContainer = document.getElementById('file-upload-container');
+            const evidenceContent = document.getElementById('evidence_content');
+            
+            if (this.value === 'text') {
+                fileUploadContainer.style.display = 'none';
+                evidenceContent.setAttribute('required', 'required');
+            } else {
+                fileUploadContainer.style.display = 'block';
+                evidenceContent.removeAttribute('required');
+            }
+        });
+        
+        // 页面加载时初始化
+        window.addEventListener('load', function() {
+            const evidenceType = document.getElementById('evidence_type');
+            const fileUploadContainer = document.getElementById('file-upload-container');
+            
+            if (evidenceType.value === 'text') {
+                fileUploadContainer.style.display = 'none';
+                document.getElementById('evidence_content').setAttribute('required', 'required');
+            }
+        });
+        
+        // 自动关闭flash消息
+        setTimeout(() => {
+            const flashes = document.querySelectorAll('.flash');
+            flashes.forEach(flash => {
+                flash.style.opacity = '0';
+                flash.style.transform = 'translateX(100%)';
+                flash.style.transition = 'opacity 0.3s, transform 0.3s';
+                setTimeout(() => flash.remove(), 300);
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

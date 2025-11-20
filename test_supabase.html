@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supabase 功能测试</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
+    h1 { font-size: 20px; }
+    section { border: 1px solid #ddd; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .log { white-space: pre-wrap; background: #f8f8f8; padding: 12px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; }
+    button { padding: 6px 12px; }
+    input[type="file"] { margin-left: 8px; }
+    .ok { color: #0a7; }
+    .err { color: #d33; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Supabase 功能测试页</h1>
+  <p class="muted">用于验证：数据库连接、Supabase存储、文件上传、证据创建与读取。</p>
+
+  <section>
+    <h2>1）环境与连接检查</h2>
+    <div class="row">
+      <button id="btnHealth">检查 /__health</button>
+      <button id="btnDiag">检查 /__diag</button>
+      <button id="btnDbPing">数据库 Ping</button>
+      <button id="btnSbPing">Supabase Ping</button>
+    </div>
+    <div id="envLog" class="log"></div>
+  </section>
+
+  <section>
+    <h2>2）文件上传（优先 Supabase）</h2>
+    <div class="row">
+      <input type="file" id="uploadInput" />
+      <button id="btnUpload">上传文件</button>
+    </div>
+    <div id="uploadLog" class="log"></div>
+  </section>
+
+  <section>
+    <h2>3）证据创建测试</h2>
+    <div class="row">
+      <input type="number" id="caseIdInput" placeholder="案件ID，如 1" />
+      <input type="text" id="eviContent" placeholder="证据描述" />
+      <select id="eviType">
+        <option value="text">text</option>
+        <option value="image">image</option>
+        <option value="audio">audio</option>
+        <option value="video">video</option>
+        <option value="file">file</option>
+        <option value="auto">auto</option>
+      </select>
+      <label><input type="checkbox" id="eviKey" />关键证据</label>
+      <label><input type="checkbox" id="eviProxy" />代对峙方提交</label>
+      <button id="btnCreateEvidence">创建证据</button>
+    </div>
+    <div id="eviLog" class="log"></div>
+  </section>
+
+  <section>
+    <h2>4）实时结果显示</h2>
+    <div class="row">
+      <input type="number" id="caseIdQuery" placeholder="案件ID用于查询" />
+      <button id="btnQueryEvidences">查询证据列表</button>
+    </div>
+    <div id="listLog" class="log"></div>
+  </section>
+
+  <script>
+    function log(el, msg, kind) {
+      const p = document.createElement('div');
+      p.className = kind === 'error' ? 'err' : kind === 'ok' ? 'ok' : '';
+      p.textContent = (typeof msg === 'string') ? msg : JSON.stringify(msg, null, 2);
+      el.prepend(p);
+    }
+
+    async function getJSON(url) {
+      const r = await fetch(url, { credentials: 'include' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }
+
+    document.getElementById('btnHealth').onclick = async () => {
+      const box = document.getElementById('envLog');
+      try { const d = await getJSON('/__health'); log(box, d, 'ok'); }
+      catch (e) { log(box, e.message, 'error'); }
+    };
+
+    document.getElementById('btnDiag').onclick = async () => {
+      const box = document.getElementById('envLog');
+      try { const d = await getJSON('/__diag'); log(box, d, 'ok'); }
+      catch (e) { log(box, e.message, 'error'); }
+    };
+
+    document.getElementById('btnDbPing').onclick = async () => {
+      const box = document.getElementById('envLog');
+      try { const d = await getJSON('/api/test/db_ping'); log(box, d, 'ok'); }
+      catch (e) { log(box, e.message, 'error'); }
+    };
+
+    document.getElementById('btnSbPing').onclick = async () => {
+      const box = document.getElementById('envLog');
+      try { const d = await getJSON('/api/test/supabase_ping'); log(box, d, 'ok'); }
+      catch (e) { log(box, e.message, 'error'); }
+    };
+
+    document.getElementById('btnUpload').onclick = async () => {
+      const box = document.getElementById('uploadLog');
+      const f = document.getElementById('uploadInput').files[0];
+      if (!f) { log(box, '请选择文件', 'error'); return; }
+      const fd = new FormData();
+      fd.append('file', f);
+      try {
+        const r = await fetch('/api/test/upload', { method: 'POST', body: fd, credentials: 'include' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        log(box, d, 'ok');
+      } catch (e) {
+        log(box, e.message, 'error');
+      }
+    };
+
+    document.getElementById('btnCreateEvidence').onclick = async () => {
+      const box = document.getElementById('eviLog');
+      const caseId = Number(document.getElementById('caseIdInput').value || '0');
+      const content = document.getElementById('eviContent').value || '';
+      const eviType = document.getElementById('eviType').value;
+      const isKey = document.getElementById('eviKey').checked;
+      const isProxy = document.getElementById('eviProxy').checked;
+      if (!caseId) { log(box, '请输入有效案件ID', 'error'); return; }
+      const fd = new FormData();
+      fd.append('content', content);
+      fd.append('evidence_type', eviType);
+      if (isKey) fd.append('is_key', 'on');
+      if (isProxy) fd.append('is_proxy', 'on');
+      try {
+        const r = await fetch(`/submit_evidence/${caseId}`, { method: 'POST', body: fd, credentials: 'include' });
+        if (r.redirected) {
+          log(box, { redirected_to: r.url }, 'ok');
+        } else if (!r.ok) {
+          throw new Error('HTTP ' + r.status);
+        } else {
+          log(box, '提交成功', 'ok');
+        }
+      } catch (e) {
+        log(box, e.message, 'error');
+      }
+    };
+
+    document.getElementById('btnQueryEvidences').onclick = async () => {
+      const box = document.getElementById('listLog');
+      const caseId = Number(document.getElementById('caseIdQuery').value || '0');
+      if (!caseId) { log(box, '请输入有效案件ID', 'error'); return; }
+      try {
+        const d = await getJSON(`/api/test/evidences/${caseId}`);
+        log(box, d, 'ok');
+      } catch (e) {
+        log(box, e.message, 'error');
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能内容预处理测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .input-group textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+        
+        .result-panel {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background: white;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .result-panel.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        
+        .result-panel.warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+        
+        .result-panel h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .result-content {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .violation-info {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 4px solid #f44336;
+        }
+        
+        .privacy-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .processing-log {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 4px solid #8BC34A;
+        }
+        
+        .log-item {
+            margin-bottom: 5px;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-warning {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .example-texts {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .example-btn {
+            background: #9C27B0;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-btn:hover {
+            background: #7B1FA2;
+            transform: translateY(-1px);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI智能内容预处理测试</h1>
+            <p>基于豆包API的智能内容审核与隐私信息识别系统</p>
+        </div>
+        
+        <div class="content">
+            <!-- 内容审核测试 -->
+            <div class="test-section">
+                <h3>🛡️ 内容审核测试</h3>
+                <div class="input-group">
+                    <label for="moderation-content">待审核内容：</label>
+                    <textarea id="moderation-content" placeholder="请输入需要审核的文本内容..."></textarea>
+                </div>
+                <div class="example-texts">
+                    <button class="example-btn" onclick="setExample('moderation', '你这个傻逼，怎么不去死啊？')">辱骂内容</button>
+                    <button class="example-btn" onclick="setExample('moderation', '我觉得这个政策有问题，应该改进。')">正常讨论</button>
+                    <button class="example-btn" onclick="setExample('moderation', 'cnm，nmsl，sb东西')">缩写辱骂</button>
+                    <button class="example-btn" onclick="setExample('moderation', '大家好，我是新来的，请多关照。')">友好内容</button>
+                </div>
+                <button class="btn" onclick="testAIModeration()">开始内容审核</button>
+                <div id="moderation-result" class="result-panel hidden"></div>
+            </div>
+            
+            <!-- 隐私识别测试 -->
+            <div class="test-section">
+                <h3>🔍 隐私信息识别测试</h3>
+                <div class="input-group">
+                    <label for="privacy-content">待识别内容：</label>
+                    <textarea id="privacy-content" placeholder="请输入包含隐私信息的文本内容..."></textarea>
+                </div>
+                <div class="example-texts">
+                    <button class="example-btn" onclick="setExample('privacy', '我的手机号是13812345678，邮箱是test@example.com')">联系方式</button>
+                    <button class="example-btn" onclick="setExample('privacy', '我叫张三，住在北京市朝阳区建国路88号')">个人信息</button>
+                    <button class="example-btn" onclick="setExample('privacy', '我的身份证号是110101199001011234')">身份信息</button>
+                    <button class="example-btn" onclick="setExample('privacy', '我在腾讯公司工作，担任产品经理')">工作信息</button>
+                </div>
+                <button class="btn btn-secondary" onclick="testAIPrivacy()">开始隐私识别</button>
+                <div id="privacy-result" class="result-panel hidden"></div>
+            </div>
+            
+            <!-- 综合预处理测试 -->
+            <div class="test-section">
+                <h3>⚡ 智能预处理管道测试</h3>
+                <div class="input-group">
+                    <label for="pipeline-content">待处理内容：</label>
+                    <textarea id="pipeline-content" placeholder="请输入需要综合处理的文本内容..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="enable-privacy" checked> 启用隐私信息脱敏
+                    </label>
+                </div>
+                <div class="example-texts">
+                    <button class="example-btn" onclick="setExample('pipeline', '你这个垃圾，我的电话是13812345678，有本事来打我啊！')">违规+隐私</button>
+                    <button class="example-btn" onclick="setExample('pipeline', '我是李四，在阿里巴巴工作，邮箱是lisi@alibaba.com')">工作信息</button>
+                    <button class="example-btn" onclick="setExample('pipeline', '我觉得这个设计有问题，用户体验不够友好。')">正常反馈</button>
+                    <button class="example-btn" onclick="setExample('pipeline', 'sb东西，老子住在上海市浦东新区世纪大道1号')">辱骂+地址</button>
+                </div>
+                <button class="btn btn-danger" onclick="testIntelligentPipeline()">开始综合处理</button>
+                <div id="pipeline-result" class="result-panel hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setExample(type, content) {
+            if (type === 'moderation') {
+                document.getElementById('moderation-content').value = content;
+            } else if (type === 'privacy') {
+                document.getElementById('privacy-content').value = content;
+            } else if (type === 'pipeline') {
+                document.getElementById('pipeline-content').value = content;
+            }
+        }
+        
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '<div class="loading"></div> 处理中，请稍候...';
+            element.classList.remove('hidden');
+        }
+        
+        function hideLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+        }
+        
+        async function testAIModeration() {
+            const content = document.getElementById('moderation-content').value;
+            const resultDiv = document.getElementById('moderation-result');
+            
+            if (!content.trim()) {
+                alert('请输入待审核的内容');
+                return;
+            }
+            
+            showLoading('moderation-result');
+            
+            try {
+                const response = await fetch('/api/test/ai_moderation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content: content })
+                });
+                
+                const result = await response.json();
+                displayModerationResult(result);
+            } catch (error) {
+                displayError('moderation-result', '请求失败: ' + error.message);
+            }
+        }
+        
+        async function testAIPrivacy() {
+            const content = document.getElementById('privacy-content').value;
+            const resultDiv = document.getElementById('privacy-result');
+            
+            if (!content.trim()) {
+                alert('请输入待识别的内容');
+                return;
+            }
+            
+            showLoading('privacy-result');
+            
+            try {
+                const response = await fetch('/api/test/ai_privacy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content: content })
+                });
+                
+                const result = await response.json();
+                displayPrivacyResult(result);
+            } catch (error) {
+                displayError('privacy-result', '请求失败: ' + error.message);
+            }
+        }
+        
+        async function testIntelligentPipeline() {
+            const content = document.getElementById('pipeline-content').value;
+            const enablePrivacy = document.getElementById('enable-privacy').checked;
+            const resultDiv = document.getElementById('pipeline-result');
+            
+            if (!content.trim()) {
+                alert('请输入待处理的内容');
+                return;
+            }
+            
+            showLoading('pipeline-result');
+            
+            try {
+                const response = await fetch('/api/test/intelligent_pipeline', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        content: content,
+                        enable_privacy_masking: enablePrivacy
+                    })
+                });
+                
+                const result = await response.json();
+                displayPipelineResult(result);
+            } catch (error) {
+                displayError('pipeline-result', '请求失败: ' + error.message);
+            }
+        }
+        
+        function displayModerationResult(result) {
+            const resultDiv = document.getElementById('moderation-result');
+            let html = '<h4>内容审核结果</h4>';
+            
+            if (result.is_violation) {
+                resultDiv.className = 'result-panel error';
+                html += `<div class="violation-info">
+                    <strong>⚠️ 检测到违规内容</strong><br>
+                    <strong>严重程度:</strong> <span class="status-badge status-error">${result.severity}</span><br>
+                    <strong>违规原因:</strong> ${result.reason}
+                </div>`;
+            } else {
+                resultDiv.className = 'result-panel';
+                html += `<div class="status-badge status-success">✅ 内容审核通过</div>`;
+                if (result.reason) {
+                    html += `<p><strong>说明:</strong> ${result.reason}</p>`;
+                }
+            }
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.remove('hidden');
+        }
+        
+        function displayPrivacyResult(result) {
+            const resultDiv = document.getElementById('privacy-result');
+            let html = '<h4>隐私信息识别结果</h4>';
+            
+            if (result.has_privacy) {
+                resultDiv.className = 'result-panel warning';
+                html += `<div class="privacy-info">
+                    <strong>🔍 发现隐私信息</strong><br>
+                    <strong>隐私项目数:</strong> ${result.privacy_items ? result.privacy_items.length : 0}<br>
+                </div>`;
+                
+                if (result.sanitized_content && result.sanitized_content !== document.getElementById('privacy-content').value) {
+                    html += `<div class="result-content"><strong>脱敏后内容:</strong><br>${result.sanitized_content}</div>`;
+                }
+                
+                if (result.privacy_items && result.privacy_items.length > 0) {
+                    html += '<div class="privacy-info"><strong>识别的隐私项目:</strong><ul>';
+                    result.privacy_items.forEach(item => {
+                        html += `<li><strong>${item.type}:</strong> ${item.content}</li>`;
+                    });
+                    html += '</ul></div>';
+                }
+            } else {
+                resultDiv.className = 'result-panel';
+                html += `<div class="status-badge status-success">✅ 未发现隐私信息</div>`;
+            }
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.remove('hidden');
+        }
+        
+        function displayPipelineResult(result) {
+            const resultDiv = document.getElementById('pipeline-result');
+            let html = '<h4>智能预处理结果</h4>';
+            
+            if (!result.is_allowed) {
+                resultDiv.className = 'result-panel error';
+                const violation = result.violation_info;
+                html += `<div class="violation-info">
+                    <strong>❌ 内容审核未通过</strong><br>
+                    <strong>严重程度:</strong> <span class="status-badge status-error">${violation.severity}</span><br>
+                    <strong>原因:</strong> ${violation.reason}<br>
+                    <strong>建议:</strong> ${violation.suggestion}
+                </div>`;
+            } else {
+                resultDiv.className = 'result-panel';
+                html += `<div class="status-badge status-success">✅ 内容处理成功</div>`;
+                
+                if (result.processed_content && result.processed_content !== document.getElementById('pipeline-content').value) {
+                    html += `<div class="result-content"><strong>处理后内容:</strong><br>${result.processed_content}</div>`;
+                }
+                
+                if (result.privacy_info && result.privacy_info.has_privacy) {
+                    html += `<div class="privacy-info">
+                        <strong>🔒 隐私信息已脱敏</strong><br>
+                        <strong>处理项目数:</strong> ${result.privacy_info.item_count}<br>
+                        <strong>隐私类型:</strong> ${result.privacy_info.privacy_types.join(', ')}
+                    </div>`;
+                }
+            }
+            
+            if (result.processing_log && result.processing_log.length > 0) {
+                html += '<div class="processing-log"><strong>处理日志:</strong>';
+                result.processing_log.forEach(log => {
+                    html += `<div class="log-item">• ${log}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.remove('hidden');
+        }
+        
+        function displayError(elementId, message) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.className = 'result-panel error';
+            resultDiv.innerHTML = `<h4>错误</h4><p>${message}</p>`;
+            resultDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
